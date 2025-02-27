@@ -88,26 +88,10 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
 
     // el nuevo nodo es el primero (el nuevo head)
     head = inserted;
-    return 0;
     
 }
 
 int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
-    Node *current = head;
-    while(current->key!=key){
-        current=current->next;
-        if (current == NULL){
-            return -1;
-        }
     
-    }
-    *N_value2 = current->N_value;
-    strcpy(value1, current->val1);
-    memcpy(V_value2, current->val2, (*N_value2)*sizeof(double));
-    *value3 = current->coord;
-   
-
-    return 0;
-
 
 }

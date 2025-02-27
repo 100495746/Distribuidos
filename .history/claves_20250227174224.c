@@ -95,17 +95,15 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
 int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
     Node *current = head;
     while(current->key!=key){
+
         current=current->next;
-        if (current == NULL){
-            return -1;
-        }
+        if 
     
     }
-    *N_value2 = current->N_value;
     strcpy(value1, current->val1);
-    memcpy(V_value2, current->val2, (*N_value2)*sizeof(double));
+    memcpy(V_value2, current->val2, N_value2);
     *value3 = current->coord;
-   
+    *N_value2 = current->N_value;
 
     return 0;
 
