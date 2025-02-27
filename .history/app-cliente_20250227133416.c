@@ -1,0 +1,10 @@
+
+
+struct Coord{
+    
+}
+
+
+int main(){
+
+}

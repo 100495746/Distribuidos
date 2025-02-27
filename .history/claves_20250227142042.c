@@ -15,4 +15,4 @@ typedef struct Node{
 
 } Node;
 
-static Node *head = NULL;
+static Node *head = `;

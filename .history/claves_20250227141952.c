@@ -1,5 +1,4 @@
-#include "claves.h"
-#include <stddef.h>
+#incl
 
 struct Coord{
     int x;

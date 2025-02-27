@@ -1,5 +1,4 @@
-#include "claves.h"
-#include <stddef.h>
+
 
 struct Coord{
     int x;
@@ -13,6 +12,6 @@ typedef struct Node{
     struct Coord coord;
     struct Node *next;
 
-} Node;
+};
 
 static Node *head = NULL;

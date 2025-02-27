@@ -1,0 +1,17 @@
+
+
+struct Coord{
+    int x;
+    int y;
+};
+
+struct Node{
+    char *val1;
+    double *val2;
+
+};
+
+
+int main(){
+
+}
