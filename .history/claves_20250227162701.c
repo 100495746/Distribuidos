@@ -10,7 +10,6 @@ typedef struct Node{
     int key;
     char *val1;
     double *val2;
-    int N_value;
     struct Coord coord;
     struct Node *next;
 
@@ -20,7 +19,7 @@ typedef struct Node{
 static Node *head = NULL;
 
 int destroy(){
-    Node *current = head;
+    
     if(head == NULL){
         return 0;
     }
@@ -38,3 +37,7 @@ int destroy(){
     return 0;
 }
 
+int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
+    while(current !=NULL)
+
+}

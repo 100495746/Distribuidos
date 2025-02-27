@@ -10,7 +10,6 @@ typedef struct Node{
     int key;
     char *val1;
     double *val2;
-    int N_value;
     struct Coord coord;
     struct Node *next;
 
@@ -30,11 +29,11 @@ int destroy(){
             free(current->val1);
             free(current->val2);
             free(current);
-            current = temp;
+            current = `;
         }
         head = NULL;
     };
 
     return 0;
-}
 
+}
