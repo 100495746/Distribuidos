@@ -117,19 +117,12 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
     if (current==NULL){
         return -1;
     }
-    if (N_value2 < 1 || N_value2 > 32){
+    if (N_value2 < 1 || N_value2 > 31){
         return -1;
     }
     free(current->val1);
-    current->val1 = (char *)malloc(strlen(value1)+1);
     free(current->val2);
     current->val2 = (char *)malloc(N_value2*sizeof(double));
-    if (current->val2 == NULL){
-        free(current->val1);
-        return -1;
-    }
-    memcpy(V_value2, current->val2, N_value2 * sizeof(double));
-    current->N_value = N_value2;
-current->coord = value3;
+    memcpy(V_value2, current->val2, )
 
 }
