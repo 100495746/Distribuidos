@@ -134,13 +134,9 @@ current->coord = value3;
 }
 /* int delete_key(int key). Este servicio permite borrar el elemento cuya 
 clave es key. La función devuelve 0 en caso de éxito y -1 en caso de error.
-En caso de que la clave no exista también se devuelve -1*/
+ En caso de que la clave no exista también se devuelve -1*/
 int delete_key(int key){
-    Node *current = head;
-    while(current!=NULL && current->key!=key){current=current->next;}
-    if (current ==NULL){
-        return -1;
-    }
-    
+        while(current!=NULL && current->key!=key){current=current->next;}
+
 
 }

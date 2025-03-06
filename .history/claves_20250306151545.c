@@ -132,15 +132,7 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
 current->coord = value3;
 
 }
-/* int delete_key(int key). Este servicio permite borrar el elemento cuya 
-clave es key. La función devuelve 0 en caso de éxito y -1 en caso de error.
-En caso de que la clave no exista también se devuelve -1*/
-int delete_key(int key){
-    Node *current = head;
-    while(current!=NULL && current->key!=key){current=current->next;}
-    if (current ==NULL){
-        return -1;
-    }
-    
 
+int delete_key(){
+    
 }
