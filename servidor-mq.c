@@ -11,3 +11,5 @@ typedef struct {
     double V_value2[32]; // Arreglo en lugar de puntero
     struct Coord value3;
 } Mensaje;
+JORDAN A LABURAR
+
