@@ -7,9 +7,10 @@
 #include <string.h>
 #include <fcntl.h>      // Para O_CREAT, O_WRONLY, etc.
 #include <sys/stat.h>   // Para permisos
+#define QUEUE_P "/cola_de_peticiones"
 
 // las colas de mensajes posix no reconocen punteros
-typedef struct peticion{
+typedef struct Peticion{
     int tipo_operacion;  // 1 = SET, 2 = GET, 3 = MODIFY
     int key;
     char value1[256];    // Arreglo en lugar de puntero
@@ -18,7 +19,7 @@ typedef struct peticion{
     struct Coord value3;
 } Peticion;
 
-typedef struct respuesta{
+typedef struct Respuesta{
     int tipo_operacion;  // 1 = SET, 2 = GET, 3 = MODIFY
     int key;
     char value1[256];    // Arreglo en lugar de puntero
@@ -27,3 +28,18 @@ typedef struct respuesta{
     struct Coord value3;
     int status;
 } Respuesta;
+
+struct mq_attr atributos_cliente = {
+    .mq_flags = 0,          
+    .mq_maxmsg = 10,        // Máximo número de mensajes en la cola
+    .mq_msgsize = sizeof(Peticion), // Se elige Respuesta como tamaño de mensaje porque es el mayor
+    .mq_curmsgs = 0         
+};
+
+struct mq_attr atributos_servidor = {
+    .mq_flags = 0,          
+    .mq_maxmsg = 10,        // Máximo número de mensajes en la cola
+    .mq_msgsize = sizeof(Respuesta), // Se elige Respuesta como tamaño de mensaje porque es el mayor
+    .mq_curmsgs = 0         
+};
+
