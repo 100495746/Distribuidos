@@ -1,28 +1,29 @@
 #include "proxy_cliente.h"
 
 Respuesta send_rcv(Peticion *peticion){
-    mqd_t mp, mr;
+    mqd_t server, cliente;
     Respuesta respuesta;
-    mp = mq_open(QUEUE_P, O_WRONLY, 0666, &atributos_cliente);
-    if(mp == (mqd_t)-1){
+    server = mq_open(PETICIONES, O_WRONLY, 0666, &atributos_peticion);
+    if(server == (mqd_t)-1){
         perror("Error en mq_open");
         exit(-1);
     }
-    if(mq_send(mp, (char *)peticion, sizeof(Peticion), 0) == -1){
+    if(mq_send(server, (char *)peticion, sizeof(Peticion), 0) == -1){
         perror("Error en mq_send");
         exit(-1);
     }
-    mq_close(mp);
-    mr = mq_open(????, O_RDONLY, 0666, &atributos_servidor);
-    if(mr == (mqd_t)-1){
+    mq_close(server);
+    cliente = mq_open(peticion->cola_respuesta, O_CREAT|O_RDONLY, 0666, &atributos_respuesta);
+    if(cliente == (mqd_t)-1){
         perror("Error en mq_open");
         exit(-1);
     }
-    if(mq_receive(mr, (char *)&respuesta, sizeof(Respuesta), NULL) == -1){
+    // Esperar hasta que reciba la respuesta añadir un bucle o algo
+    if(mq_receive(cliente, (char *)&respuesta, sizeof(Respuesta), NULL) == -1){
         perror("Error en mq_receive");
         exit(-1);
     }
-    mq_close(mr);
+    mq_close(cliente);
     return respuesta;
 
 
@@ -36,6 +37,7 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
     peticion.N_value2 = N_value2;
     memcpy(peticion.V_value2, V_value2, N_value2*sizeof(double));
     peticion.value3 = value3;
+    peticion.cola_respuesta = getpid();
 
     Respuesta respuesta = send_rcv(&peticion);
     return respuesta.status;
@@ -49,6 +51,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     peticion.N_value2 = N_value2;
     memcpy(peticion.V_value2, V_value2, N_value2*sizeof(double));
     peticion.value3 = value3;
+    peticion.cola_respuesta = getpid();
 
     Respuesta respuesta = send_rcv(&peticion);
     return respuesta.status;
@@ -62,6 +65,7 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
     peticion.N_value2 = N_value2;
     memcpy(peticion.V_value2, V_value2, N_value2*sizeof(double));
     peticion.value3 = value3;
+    peticion.cola_respuesta = getpid();
 
     Respuesta respuesta = send_rcv(&peticion);
     return respuesta.status;
