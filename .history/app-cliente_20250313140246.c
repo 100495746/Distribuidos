@@ -46,7 +46,7 @@ void *client_thread(void *arg) {
         for (int i = 0; i < get_N_value2; i++) {
             printf("Thread %d: V_value2[%d]: %f\n", thread_id, i, get_V_value2[i]);
         }
-        printf("Thread %d: Coord: (%d, %d)\n", thread_id, get_value3.x, get_value3.y);
+        printf("Thread %d: Coord: (%d, %f)\n", thread_id, get_value3.x, get_value3.y);
     } else {
         printf("Thread %d: Get value failed\n", thread_id);
     }

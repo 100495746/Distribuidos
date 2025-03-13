@@ -46,7 +46,7 @@ void *client_thread(void *arg) {
         for (int i = 0; i < get_N_value2; i++) {
             printf("Thread %d: V_value2[%d]: %f\n", thread_id, i, get_V_value2[i]);
         }
-        printf("Thread %d: Coord: (%d, %d)\n", thread_id, get_value3.x, get_value3.y);
+        printf("Thread %d: Coord: (%f, %f)\n", thread_id, get_value3.x, get_value3.y);
     } else {
         printf("Thread %d: Get value failed\n", thread_id);
     }
@@ -76,14 +76,21 @@ void *client_thread(void *arg) {
 int main() {
     signal(SIGINT, int_handler); // Handle Ctrl+C to stop the program
 
-    int thread_id = 1;
     while (keep_running) {
-        pthread_t thread;
-        pthread_create(&thread, NULL, client_thread, &thread_id);
-        pthread_detach(thread); // Detach the thread to avoid waiting for it
-        thread_id++;
+        const int num_threads = 5; // Number of concurrent clients
+        pthread_t threads[num_threads];
+        int thread_ids[num_threads];
 
-        usleep(1000); // Sleep for 100 milliseconds before creating the next client
+        for (int i = 0; i < num_threads; i++) {
+            thread_ids[i] = i + 1;
+            pthread_create(&threads[i], NULL, client_thread, &thread_ids[i]);
+        }
+
+        for (int i = 0; i < num_threads; i++) {
+            pthread_join(threads[i], NULL);
+        }
+
+        sleep(1); // Sleep for a while before creating new clients
     }
 
     printf("Program terminated. Total clients served: %d\n", client_counter);

@@ -3,15 +3,6 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <signal.h>
-
-volatile int keep_running = 1;
-int client_counter = 0;
-pthread_mutex_t counter_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-void int_handler(int dummy) {
-    keep_running = 0;
-}
 
 void *client_thread(void *arg) {
     int thread_id = *(int *)arg;
@@ -64,28 +55,22 @@ void *client_thread(void *arg) {
         printf("Thread %d: Modify value failed\n", thread_id);
     }
 
-    // Update client counter
-    pthread_mutex_lock(&counter_mutex);
-    client_counter++;
-    printf("Client counter: %d\n", client_counter);
-    pthread_mutex_unlock(&counter_mutex);
-
     return NULL;
 }
 
 int main() {
-    signal(SIGINT, int_handler); // Handle Ctrl+C to stop the program
+    const int num_threads = 5; // Number of concurrent clients
+    pthread_t threads[num_threads];
+    int thread_ids[num_threads];
 
-    int thread_id = 1;
-    while (keep_running) {
-        pthread_t thread;
-        pthread_create(&thread, NULL, client_thread, &thread_id);
-        pthread_detach(thread); // Detach the thread to avoid waiting for it
-        thread_id++;
-
-        usleep(1000); // Sleep for 100 milliseconds before creating the next client
+    for (int i = 0; i < num_threads; i++) {
+        thread_ids[i] = i + 1;
+        pthread_create(&threads[i], NULL, client_thread, &thread_ids[i]);
     }
 
-    printf("Program terminated. Total clients served: %d\n", client_counter);
+    for (int i = 0; i < num_threads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
     return 0;
 }

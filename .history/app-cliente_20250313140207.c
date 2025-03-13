@@ -46,7 +46,7 @@ void *client_thread(void *arg) {
         for (int i = 0; i < get_N_value2; i++) {
             printf("Thread %d: V_value2[%d]: %f\n", thread_id, i, get_V_value2[i]);
         }
-        printf("Thread %d: Coord: (%d, %d)\n", thread_id, get_value3.x, get_value3.y);
+        printf("Thread %d: Coord: (%f, %f)\n", thread_id, get_value3.x, get_value3.y);
     } else {
         printf("Thread %d: Get value failed\n", thread_id);
     }
@@ -83,7 +83,7 @@ int main() {
         pthread_detach(thread); // Detach the thread to avoid waiting for it
         thread_id++;
 
-        usleep(1000); // Sleep for 100 milliseconds before creating the next client
+        usleep(100000); // Sleep for 100 milliseconds before creating the next client
     }
 
     printf("Program terminated. Total clients served: %d\n", client_counter);
