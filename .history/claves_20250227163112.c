@@ -37,7 +37,7 @@ int destroy(){
     return 0;
 }
 
-int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
+int proxy_set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
     Node *current = head;
     while(current != NULL){
         if(current->key == key)
