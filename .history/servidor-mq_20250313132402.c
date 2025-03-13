@@ -49,7 +49,7 @@ void *tratar_peticion(void *arg) {
     return NULL;
 }
 
-int main() {
+int main((int argc, char *argv[])) {
     mqd_t server;
     struct mq_attr attr;
     attr.mq_flags = 0;
