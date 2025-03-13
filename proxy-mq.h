@@ -1,4 +1,4 @@
-#define proxy_cliente_H
+#define proxy_mq_H
 #include "claves.h"
 #include <stddef.h>
 #include <mqueue.h>  // Biblioteca POSIX de colas de mensajes
@@ -21,7 +21,6 @@ typedef struct Peticion{
 } Peticion;
 
 typedef struct Respuesta{
-    int tipo_operacion;  // 1 = SET, 2 = GET, 3 = MODIFY
     int key;
     char value1[256];    // Arreglo en lugar de puntero
     int N_value2;
