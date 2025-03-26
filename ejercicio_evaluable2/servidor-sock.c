@@ -1,32 +1,31 @@
-#include "claves.h"
-#include "proxy-mq.h"
-#include <stdio.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <mqueue.h>
-#include <stdlib.h>
-#include <string.h>
+#include "servidor-sock.h"
 
 void *tratar_peticion(void *arg) {
-    Peticion *peticion = (Peticion *)arg;
-    printf("Handling request: tipo_operacion=%d, key=%d\n", peticion->tipo_operacion, peticion->key);
-
+    int cliente_sock = *(int *)arg;
+    free(arg);
+    Peticion peticion;
     Respuesta respuesta;
-    respuesta.status = 0; // Assume success
+    if (recv(cliente_sock, &peticion, sizeof(Peticion), 0) == -1) {
+        perror("Error en recv");
+        close(cliente_sock);
+        exit(-2);
+    }
+    printf("Handling request: tipo_operacion=%d, key=%d\n", peticion.tipo_operacion, peticion.key);
 
+    respuesta.status = 0; // Assume success
     // Handle the request based on tipo_operacion
-    switch (peticion->tipo_operacion) {
+    switch (peticion.tipo_operacion) {
         case 1: // SET
             printf("Handling SET operation\n");
-            respuesta.status = set_value(peticion->key, peticion->value1, peticion->N_value2, peticion->V_value2, peticion->value3);
+            respuesta.status = set_value(peticion.key, peticion.value1, peticion.N_value2, peticion.V_value2, peticion.value3);
             break;
         case 2: // GET
             printf("Handling GET operation\n");
-            respuesta.status = get_value(peticion->key, respuesta.value1, &respuesta.N_value2, respuesta.V_value2, &respuesta.value3);
+            respuesta.status = get_value(peticion.key, respuesta.value1, &respuesta.N_value2, respuesta.V_value2, &respuesta.value3);
             break;
         case 3: // MODIFY
             printf("Handling MODIFY operation\n");
-            respuesta.status = modify_value(peticion->key, peticion->value1, peticion->N_value2, peticion->V_value2, peticion->value3);
+            respuesta.status = modify_value(peticion.key, peticion.value1, peticion.N_value2, peticion.V_value2, peticion.value3);
             break;
         default:
             printf("Unknown operation\n");
@@ -35,53 +34,56 @@ void *tratar_peticion(void *arg) {
     }
 
     // Send the response back to the client
-    char cola_respuesta[256];
-    snprintf(cola_respuesta, sizeof(cola_respuesta), "/cola_respuesta_%d", peticion->cola_respuesta);
-    printf("Opening client response queue: %s\n", cola_respuesta);
-    mqd_t cliente = mq_open(cola_respuesta, O_WRONLY);
-    if (cliente == (mqd_t)-1) {
-        perror("Error en mq_open (client response)");
-        return NULL;
+    if (send(cliente_sock, &respuesta, sizeof(Respuesta), 0) == -1) {
+        perror("Error en send");
+        close(cliente_sock);
+        exit(-2);
     }
+    close(cliente_sock);
+    return NULL;    
 
-    printf("Sending response to client: status=%d\n", respuesta.status);
-    if (mq_send(cliente, (char *)&respuesta, sizeof(Respuesta), 0) == -1) {
-        perror("Error en mq_send (client response)");
-    }
-
-    mq_close(cliente);
-    return NULL;
 }
 
 int main(int argc, char *argv[]) {
-    mqd_t server;
-    struct mq_attr attr;
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;
-    attr.mq_msgsize = sizeof(Peticion);
-    attr.mq_curmsgs = 0;
-
     printf("Starting server...\n");
-    server = mq_open(PETICIONES, O_CREAT | O_RDONLY, 0666, &attr);
-    if (server == (mqd_t)-1) {
-        perror("Error en mq_open");
-        exit(-1);
+    int server_sock;
+    struct sockaddr_in servidor_config, cliente;
+    server_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_sock == -1) {
+        perror("Error en socket");
+        exit(-2);
+    }
+    servidor_config.sin_family = AF_INET;
+    servidor_config.sin_port = htons(PUERTO);
+    servidor_config.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(server_sock, (struct sockaddr *)&servidor_config, sizeof(servidor_config)) == -1) {
+        perror("Error en bind");
+        exit(-2);
+    }
+    if (listen(server_sock, SOMAXCONN) == -1) {
+        perror("Error en listen");
+        exit(-2);
     }
 
     printf("Server started, waiting for requests...\n");
     while (1) {
-        Peticion peticion;
-        if (mq_receive(server, (char *)&peticion, sizeof(Peticion), NULL) == -1) {
-            perror("Error en mq_receive");
+        struct sockaddr_in cliente_config;
+        socklen_t cliente_tam = sizeof(cliente_config);
+        int *cliente_sock = malloc(sizeof(int));
+        *cliente_sock = accept(server_sock, (struct sockaddr *)&cliente_config, &cliente_tam);
+        if (*cliente_sock == -1) {
+            perror("Error en accept");
+            free(cliente_sock);
             exit(-2);
         }
-        printf("Received request: tipo_operacion=%d, key=%d\n", peticion.tipo_operacion, peticion.key);
+        printf("Conectado con %s:%d\n", inet_ntoa(cliente_config.sin_addr), ntohs(cliente_config.sin_port));
         // tratamos las peticion concurrentemente 
         pthread_t esclavo;
-        pthread_create(&esclavo, NULL, tratar_peticion, &peticion);
+        pthread_create(&esclavo, NULL, tratar_peticion, cliente_sock);
         pthread_detach(esclavo);         
     }
 
-    mq_close(server);
+    mq_close(server_sock);
     return 0;
 }
