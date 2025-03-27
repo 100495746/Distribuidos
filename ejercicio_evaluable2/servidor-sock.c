@@ -45,9 +45,22 @@ void *tratar_peticion(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
+
+    if (argc != 2) {
+        perror("Uso: ./servidor <puerto>\n");
+        exit(-2);
+    }
+    else{
+        char *fin_de_linea;
+        long puerto = strtol(argv[1], &fin_de_linea, 10);
+        if (*fin_de_linea != '\0' || puerto < 1024 || puerto > 49151) {
+            perror("El puerto debe ser un número entre 1024 y 49151\n");
+            exit(-2);
+        }
+    }
     printf("Starting server...\n");
     int server_sock;
-    struct sockaddr_in servidor_config, cliente;
+    struct sockaddr_in servidor_config;
     server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock == -1) {
         perror("Error en socket");
@@ -84,6 +97,6 @@ int main(int argc, char *argv[]) {
         pthread_detach(esclavo);         
     }
 
-    mq_close(server_sock);
+    close(server_sock);
     return 0;
 }

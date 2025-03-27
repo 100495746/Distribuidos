@@ -8,7 +8,7 @@ Respuesta send_rcv(Peticion *peticion) {
         respuesta.status = -2;
         return respuesta;
     }
-    if ((puerto_tuplas = getenv("PUERTO_TUPLAS")) == NULL) {
+    if ((puerto_tuplas = getenv("PORT_TUPLAS")) == NULL) {
         perror("Error en getenv");
         respuesta.status = -2;
         return respuesta;

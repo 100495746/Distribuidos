@@ -1,5 +1,5 @@
 #include "claves.h"
-#include "proxy-mq.h"
+#include "proxy-sock.h"
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -9,7 +9,7 @@ volatile int keep_running = 1;
 int client_counter = 0;
 pthread_mutex_t counter_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void int_handler(int dummy) {
+void int_handler() {
     keep_running = 0;
 }
 
