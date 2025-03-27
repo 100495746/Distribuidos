@@ -11,8 +11,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define PUERTO 8080  // No se cual usar asi que estblezco uno 
-#define MAX_CONEXIONES 50
 
 // las colas de mensajes posix no reconocen punteros
 typedef struct Peticion {

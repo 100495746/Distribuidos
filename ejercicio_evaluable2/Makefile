@@ -6,16 +6,16 @@ CFLAGS = -Wall -Wextra -pthread -lrt -fPIC
 all: libclaves.so servidor cliente
 
 # Crear la biblioteca dinámica
-libclaves.so: proxy-mq.o claves.o
-	$(CC) -shared -o libclaves.so proxy-mq.o claves.o $(CFLAGS)
+libclaves.so: proxy-sock.o claves.o
+	$(CC) -shared -o libclaves.so proxy-sock.o claves.o $(CFLAGS)
 
 # Compilar el servidor
-servidor: servidor-mq.o claves.o proxy-mq.o
-	$(CC) -o servidor servidor-mq.o claves.o proxy-mq.o $(CFLAGS)
+servidor: servidor-sock.o claves.o proxy-sock.o
+	$(CC) -o servidor servidor-sock.o claves.o proxy-sock.o $(CFLAGS)
 
 # Compilar el cliente
-cliente: app-cliente.o claves.o proxy-mq.o
-	$(CC) -o cliente app-cliente.o claves.o proxy-mq.o $(CFLAGS)
+cliente: app-cliente.o claves.o proxy-sock.o
+	$(CC) -o cliente app-cliente.o claves.o proxy-sock.o $(CFLAGS)
 
 # Reglas para compilar archivos .c a .o
 %.o: %.c

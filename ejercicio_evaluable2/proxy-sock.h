@@ -10,8 +10,7 @@
 #include <sys/stat.h>   // Para permisos
 #include <unistd.h>
 #include <arpa/inet.h>
-
-#define PUERTO 8080
+#include <netdb.h>    // Para gethostbyname
 
 
 

@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
         exit(-2);
     }
     servidor_config.sin_family = AF_INET;
-    servidor_config.sin_port = htons(PUERTO);
+    servidor_config.sin_port = htons(atoi(argv[1]));
     servidor_config.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(server_sock, (struct sockaddr *)&servidor_config, sizeof(servidor_config)) == -1) {

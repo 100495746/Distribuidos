@@ -1,14 +1,38 @@
 #include "proxy-sock.h"
 
 Respuesta send_rcv(Peticion *peticion) {
+    char *ip_tuplas, *puerto_tuplas;
+    Respuesta respuesta;
+    if ((ip_tuplas = getenv("IP_TUPLAS")) == NULL) {
+        perror("Error en getenv");
+        respuesta.status = -2;
+        return respuesta;
+    }
+    if ((puerto_tuplas = getenv("PUERTO_TUPLAS")) == NULL) {
+        perror("Error en getenv");
+        respuesta.status = -2;
+        return respuesta;
+    }  
     int cliente_sock;
     struct sockaddr_in servidor;
-    Respuesta respuesta;
+    struct hostent *host;
 
     cliente_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (cliente_sock == -1) {
+        perror("Error en socket cliente");
+        respuesta.status = -2;
+        close(cliente_sock);
+        return respuesta;
+    }
     servidor.sin_family = AF_INET;
-    servidor.sin_port = htons(PUERTO);
-    inet_pton(AF_INET, , &servidor.sin_addr);
+    servidor.sin_port = htons(atoi(puerto_tuplas));
+
+    if ((host = gethostbyname(ip_tuplas)) == NULL) {
+        perror("Error en gethostbyname");
+        respuesta.status = -2;
+        return respuesta;
+    }
+    memcpy(&servidor.sin_addr, host->h_addr_list[0], host->h_length);
 
     if (connect(cliente_sock, (struct sockaddr *)&servidor, sizeof(servidor)) == -1) {
         perror("Error en connect");
@@ -16,6 +40,7 @@ Respuesta send_rcv(Peticion *peticion) {
         close(cliente_sock);
         return respuesta;
     }
+
 
     send(cliente_sock, peticion, sizeof(Peticion), 0);
     recv(cliente_sock, &respuesta, sizeof(Respuesta), 0);
