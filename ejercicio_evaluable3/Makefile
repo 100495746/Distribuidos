@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pthread -fPIC -D_REENTRANT
+CFLAGS = -Wall -Wextra -pthread -fPIC -D_REENTRANT -I. -I/usr/include/tirpc
+LDFLAGS = -ltirpc
 
 RPC_X = claves_rpc.x
 RPCGEN_FLAGS = -M -C  # -M genera servidor multihilo
@@ -21,13 +22,13 @@ rpcgen: $(RPC_X)
 	rpcgen $(RPCGEN_FLAGS) -s tcp -o $(RPC_SVC) $(RPC_X)
 
 libclaves.so: proxy-rpc.o claves.o $(RPC_CLNT:.c=.o) $(RPC_XDR:.c=.o)
-	$(CC) -shared -o $@ $^ $(CFLAGS) -lnsl
+	$(CC) -shared -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
-servidor: servidor-rpc.o claves.o $(RPC_SVC:.c=.o) $(RPC_XDR:.c=.o)
-	$(CC) -o $@ $^ $(CFLAGS) -lnsl -lpthread
+servidor: servidor-rpc.o claves.o $(RPC_SVC:.c=.o) $(RPC_XDR:.c:.o)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) -lpthread
 
-cliente: app-cliente.o claves.o proxy-rpc.o $(RPC_CLNT:.c=.o) $(RPC_XDR:.c=.o)
-	$(CC) -o $@ $^ $(CFLAGS) -lnsl -lpthread
+cliente: app-cliente.o claves.o proxy-rpc.o $(RPC_CLNT:.c:.o) $(RPC_XDR:.c:.o)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) -lpthread
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
