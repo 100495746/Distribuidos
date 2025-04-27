@@ -1,10 +1,8 @@
+%#include "claves.h"
+
 const MAX_STRING = 256;
 const MAX_ARRAY  = 32;
 
-struct Coord {
-    int x;
-    int y;
-};
 
 struct KeyArg {
     int key;
@@ -44,3 +42,4 @@ program CLAVES_PROG {
         int EXIST(KeyArg)          = 5;
     } = 1;
 } = 0x20000001;
+

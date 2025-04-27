@@ -1,37 +1,35 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -pthread -fPIC -D_REENTRANT -I. -I/usr/include/tirpc
+CC      = gcc
+CFLAGS  = -Wall -Wextra -pthread -fPIC -I. -I/usr/include/tirpc -D_REENTRANT
+RPCGEN_FLAGS = -M 
 LDFLAGS = -ltirpc
 
-RPC_X = claves_rpc.x
-RPCGEN_FLAGS = -M -C  # -M genera servidor multihilo
+RPC_STUBS = claves_rpc.h claves_rpc_xdr.c claves_rpc_clnt.c claves_rpc_svc.c
 
-# Generated files
-RPC_HDR  = claves_rpc.h
-RPC_XDR  = claves_rpc_xdr.c
-RPC_CLNT = claves_rpc_clnt.c
-RPC_SVC  = claves_rpc_svc.c
+all: $(RPC_STUBS) libclaves.so servidor cliente
 
-.PHONY: all rpcgen clean
 
-all: rpcgen libclaves.so servidor cliente
+$(RPC_STUBS): claves_rpc.x
+	rpcgen -M -h -o claves_rpc.h        $<
+	rpcgen -M -c -o claves_rpc_xdr.c    $<
+	rpcgen -M -l -o claves_rpc_clnt.c   $<
+	rpcgen -M -s tcp -o claves_rpc_svc.c $<
 
-rpcgen: $(RPC_X)
-	rpcgen $(RPCGEN_FLAGS) -h -o $(RPC_HDR) $(RPC_X)
-	rpcgen $(RPCGEN_FLAGS) -c -o $(RPC_XDR) $(RPC_X)
-	rpcgen $(RPCGEN_FLAGS) -l -o $(RPC_CLNT) $(RPC_X)
-	rpcgen $(RPCGEN_FLAGS) -s tcp -o $(RPC_SVC) $(RPC_X)
 
-libclaves.so: proxy-rpc.o claves.o $(RPC_CLNT:.c=.o) $(RPC_XDR:.c=.o)
+libclaves.so: proxy-rpc.o claves.o claves_rpc_clnt.o claves_rpc_xdr.o
 	$(CC) -shared -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
-servidor: servidor-rpc.o claves.o $(RPC_SVC:.c=.o) $(RPC_XDR:.c:.o)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) -lpthread
+servidor: servidor-rpc.o claves.o claves_rpc_svc.o claves_rpc_xdr.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
-cliente: app-cliente.o claves.o proxy-rpc.o $(RPC_CLNT:.c:.o) $(RPC_XDR:.c:.o)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) -lpthread
+
+cliente: app-cliente.o claves.o proxy-rpc.o claves_rpc_clnt.o claves_rpc_xdr.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
 
 %.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o servidor cliente libclaves.so $(RPC_HDR) $(RPC_XDR) $(RPC_CLNT) $(RPC_SVC)
+	rm -f *.o servidor cliente libclaves.so $(RPC_STUBS)
+
+

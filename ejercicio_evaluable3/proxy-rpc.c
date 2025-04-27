@@ -19,8 +19,7 @@ static int init_client(void){
 
     char *ip = getenv("IP_TUPLAS");
     if(!ip){
-        fprintf(stderr, "IP_TUPLAS no definida
-");
+        fprintf(stderr, "IP_TUPLAS no definida\n");
         return RPC_ERROR;
     }
 
@@ -29,7 +28,6 @@ static int init_client(void){
         clnt_pcreateerror(ip);
         return RPC_ERROR;
     }
-    /* Se podrían configurar timeouts aquí con clnt_control si se desea */
     return 0;
 }
 
@@ -63,8 +61,8 @@ int proxy_get_value(int key, char *value1, int *N_value2, double *V_value2, stru
     GetReply *reply = get_value_1(&k, clnt);
     if(!reply) return RPC_ERROR; /* fallo RPC */
 
-    if(reply->status != 0){ /* error lógico devuelto por el servidor */
-        return reply->status; // -1 o -2 provenientes del servidor
+    if(reply->status != 0){
+        return reply->status; // -1 o -2 del servidor
     }
 
     strncpy(value1, reply->value1, MAX_STRING);
@@ -112,3 +110,5 @@ int exist(int key){
     int *result = exist_1(&k, clnt);
     return check_null(result);
 }
+
+
