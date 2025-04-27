@@ -1,5 +1,5 @@
 %#include "claves.h"
-
+%typedef struct Coord Coord;
 const MAX_STRING = 256;
 const MAX_ARRAY  = 32;
 

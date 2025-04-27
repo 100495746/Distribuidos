@@ -1,48 +1,35 @@
 #include "claves.h"
 #include "claves_rpc.h"
 #include <rpc/clnt.h>
+#include <rpc/xdr.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define MAX_STRING 256
 #define MAX_ARRAY  32
-
-/* Códigos de retorno adicionales */
-#define RPC_ERROR -2  /* Error a nivel de librería RPC (timeout, servidor caído, etc.) */
+#define RPC_ERROR -2  /* Error a nivel de librería RPC */
 
 static CLIENT *clnt = NULL;
 
-/* Helper para conectar la primera vez */
-static int init_client(void){
-    if(clnt) return 0; /* ya conectado */
-
+static int init_client(void) {
+    if (clnt) return 0;
     char *ip = getenv("IP_TUPLAS");
-    if(!ip){
+    if (!ip) {
         fprintf(stderr, "IP_TUPLAS no definida\n");
         return RPC_ERROR;
     }
-
     clnt = clnt_create(ip, CLAVES_PROG, CLAVES_VERS, "tcp");
-    if(!clnt){
+    if (!clnt) {
         clnt_pcreateerror(ip);
         return RPC_ERROR;
     }
     return 0;
 }
 
-static int check_null(int *result){
-    if(!result){
-        /* fallo en la RPC: devolvemos -2 */
-        return RPC_ERROR;
-    }
-    return *result; /* valor devuelto por el servidor (-1,0, etc.) */
-}
-
-int proxy_set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
-    if(init_client()!=0) return RPC_ERROR;
-
-    SetArgs args;
+int proxy_set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3) {
+    if (init_client() != 0) return RPC_ERROR;
+    SetArgs args = {0};
     args.key = key;
     args.value1 = value1;
     args.N_value2 = N_value2;
@@ -50,36 +37,35 @@ int proxy_set_value(int key, char *value1, int N_value2, double *V_value2, struc
     args.V_value2.V_value2_val = V_value2;
     args.value3 = value3;
 
-    int *result = set_value_1(&args, clnt);
-    return check_null(result);
+    int result = -1;
+    enum clnt_stat st = set_value_1(&args, &result, clnt);
+    if (st != RPC_SUCCESS) return RPC_ERROR;
+    return result;
 }
 
-int proxy_get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
-    if(init_client()!=0) return RPC_ERROR;
+int proxy_get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3) {
+    if (init_client() != 0) return RPC_ERROR;
+    KeyArg arg = {.key = key};
+    GetReply reply;
+    memset(&reply, 0, sizeof(reply));
 
-    KeyArg k = {.key = key};
-    GetReply *reply = get_value_1(&k, clnt);
-    if(!reply) return RPC_ERROR; /* fallo RPC */
+    enum clnt_stat st = get_value_1(&arg, &reply, clnt);
+    if (st != RPC_SUCCESS) return RPC_ERROR;
+    if (reply.status != 0) return reply.status;
 
-    if(reply->status != 0){
-        return reply->status; // -1 o -2 del servidor
+    strncpy(value1, reply.value1, MAX_STRING);
+    *N_value2 = reply.N_value2;
+    for (int i = 0; i < reply.N_value2 && i < MAX_ARRAY; i++) {
+        V_value2[i] = reply.V_value2.V_value2_val[i];
     }
-
-    strncpy(value1, reply->value1, MAX_STRING);
-    *N_value2 = reply->N_value2;
-    for(int i=0;i<reply->N_value2 && i<MAX_ARRAY;i++){
-        V_value2[i] = reply->V_value2.V_value2_val[i];
-    }
-    *value3 = reply->value3;
-
-    xdr_free((xdrproc_t)xdr_GetReply, (char*)reply);
+    *value3 = reply.value3;
+    xdr_free((xdrproc_t)xdr_GetReply, (char *)&reply);
     return 0;
 }
 
-int proxy_modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
-    if(init_client()!=0) return RPC_ERROR;
-
-    ModifyArgs args;
+int proxy_modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3) {
+    if (init_client() != 0) return RPC_ERROR;
+    ModifyArgs args = {0};
     args.key = key;
     args.value1 = value1;
     args.N_value2 = N_value2;
@@ -87,28 +73,35 @@ int proxy_modify_value(int key, char *value1, int N_value2, double *V_value2, st
     args.V_value2.V_value2_val = V_value2;
     args.value3 = value3;
 
-    int *result = modify_value_1(&args, clnt);
-    return check_null(result);
+    int result = -1;
+    enum clnt_stat st = modify_value_1(&args, &result, clnt);
+    if (st != RPC_SUCCESS) return RPC_ERROR;
+    return result;
 }
 
-int destroy(void){
-    if(init_client()!=0) return RPC_ERROR;
-    int *result = destroy_1(NULL, clnt);
-    return check_null(result);
+int destroy(void) {
+    if (init_client() != 0) return RPC_ERROR;
+    int result = -1;
+    enum clnt_stat st = destroy_1(NULL, &result, clnt);
+    if (st != RPC_SUCCESS) return RPC_ERROR;
+    return result;
 }
 
-int delete_key(int key){
-    if(init_client()!=0) return RPC_ERROR;
-    KeyArg k={.key=key};
-    int *result = delete_key_1(&k, clnt);
-    return check_null(result);
+int delete_key(int key) {
+    if (init_client() != 0) return RPC_ERROR;
+    KeyArg arg = {.key = key};
+    int result = -1;
+    enum clnt_stat st = delete_key_1(&arg, &result, clnt);
+    if (st != RPC_SUCCESS) return RPC_ERROR;
+    return result;
 }
 
-int exist(int key){
-    if(init_client()!=0) return RPC_ERROR;
-    KeyArg k={.key=key};
-    int *result = exist_1(&k, clnt);
-    return check_null(result);
+int exist(int key) {
+    if (init_client() != 0) return RPC_ERROR;
+    KeyArg arg = {.key = key};
+    int result = -1;
+    enum clnt_stat st = exist_1(&arg, &result, clnt);
+    if (st != RPC_SUCCESS) return RPC_ERROR;
+    return result;
 }
-
 
