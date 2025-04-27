@@ -1,5 +1,5 @@
 #include "claves.h"
-#include "proxy-sock.h"
+//#include "proxy-sock.h"
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>

@@ -5,8 +5,6 @@
 #include <string.h>
 
 
-
-
 typedef struct Node{
     int key;
     char *val1;
@@ -191,4 +189,18 @@ int delete_key(int key){
 
     
     return 0;   
+}
+
+int exist(int key) {
+    pthread_mutex_lock(&mutex);
+    Node *current = head;
+    while (current != NULL) {
+        if (current->key == key) {
+            pthread_mutex_unlock(&mutex);
+            return 1; // Existe
+        }
+        current = current->next;
+    }
+    pthread_mutex_unlock(&mutex);
+    return 0; // No existe
 }

@@ -35,7 +35,8 @@ int proxy_set_value(int key, char *value1, int N_value2, double *V_value2, struc
     args.N_value2 = N_value2;
     args.V_value2.V_value2_len = N_value2;
     args.V_value2.V_value2_val = V_value2;
-    args.value3 = value3;
+    memcpy(args.value3, &value3, sizeof(struct Coord));
+
 
     int result = -1;
     enum clnt_stat st = set_value_1(&args, &result, clnt);
@@ -58,7 +59,7 @@ int proxy_get_value(int key, char *value1, int *N_value2, double *V_value2, stru
     for (int i = 0; i < reply.N_value2 && i < MAX_ARRAY; i++) {
         V_value2[i] = reply.V_value2.V_value2_val[i];
     }
-    *value3 = reply.value3;
+    memcpy(value3, reply.value3, sizeof(struct Coord));
     xdr_free((xdrproc_t)xdr_GetReply, (char *)&reply);
     return 0;
 }
@@ -71,7 +72,8 @@ int proxy_modify_value(int key, char *value1, int N_value2, double *V_value2, st
     args.N_value2 = N_value2;
     args.V_value2.V_value2_len = N_value2;
     args.V_value2.V_value2_val = V_value2;
-    args.value3 = value3;
+    memcpy(args.value3, &value3, sizeof(struct Coord));
+
 
     int result = -1;
     enum clnt_stat st = modify_value_1(&args, &result, clnt);

@@ -1,8 +1,10 @@
 %#include "claves.h"
-%typedef struct Coord Coord;
+
 const MAX_STRING = 256;
 const MAX_ARRAY  = 32;
 
+/* Usamos opaque para Coord */
+typedef opaque Coord[8];
 
 struct KeyArg {
     int key;
@@ -34,12 +36,11 @@ struct GetReply {
 
 program CLAVES_PROG {
     version CLAVES_VERS {
-        int DESTROY(void)          = 0;
-        int SET_VALUE(SetArgs)     = 1;
-        GetReply GET_VALUE(KeyArg) = 2;
-        int DELETE_KEY(KeyArg)     = 3;
-        int MODIFY_VALUE(ModifyArgs) = 4;
-        int EXIST(KeyArg)          = 5;
+        int DESTROY(void)              = 0;
+        int SET_VALUE(SetArgs)          = 1;
+        GetReply GET_VALUE(KeyArg)      = 2;
+        int DELETE_KEY(KeyArg)          = 3;
+        int MODIFY_VALUE(ModifyArgs)    = 4;
+        int EXIST(KeyArg)               = 5;
     } = 1;
 } = 0x20000001;
-
