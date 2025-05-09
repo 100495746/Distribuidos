@@ -2,7 +2,9 @@
 // Estructuras de control
 main() {
     int i = 0;
-    if (i == 0) puts("Inicio correcto");
+    if (i == 0){
+        puts("Inicio correcto");
+    }
     while (i < 3) {
         printf("while: i = %d\n", i);
         i = i + 1;

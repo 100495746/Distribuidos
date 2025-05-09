@@ -1,12 +1,12 @@
 // 11_nested_ifelse.c
 // If anidado
-int classify(int x) {
+classify(int x) {
     if (x < 0) {
-        if (x % 2 == 0) return -2;
-        else return -1;
+        if (x % 2 == 0){ return -2;}
+        else {return -1;}
     } else {
-        if (x % 2 == 0) return 2;
-        else return 1;
+        if (x % 2 == 0) {return 2;}
+        else {return 1;}
     }
 }
 

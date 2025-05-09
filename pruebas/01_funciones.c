@@ -1,12 +1,16 @@
 // 01_funciones.c
 // Funciones y retorno
-int suma(int x, int y) {
+suma(int x, int y) {
     return x + y;
 }
 
-int factorial(int n) {
-    if (n <= 1) return 1;
-    else return n * factorial(n - 1);
+factorial(int n) {
+    if (n <= 1){
+        return 1;
+    } 
+    else {
+        return n * factorial(n - 1);
+    } 
 }
 
 main() {

@@ -1,6 +1,6 @@
 // 08_param_prefix.c
 // Parámetros sin prefijo
-int sum(int x, int y) {
+sum(int x, int y) {
     return x + y;
 }
 

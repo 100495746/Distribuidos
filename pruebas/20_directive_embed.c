@@ -1,6 +1,6 @@
 // 20_directive_embed.c
 // Prueba de //@ embed
-int f1(int x) { return x*x; }
+f1(int x) { return x*x; }
 
 //@ (print (f1 4))
 //@ (print (f1 7))
