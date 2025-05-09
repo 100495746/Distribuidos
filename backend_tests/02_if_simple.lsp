@@ -1,7 +1,0 @@
-(setq a 3)
-(defun main ()
-  (if (> a 2)
-    (princ a)
-  )
-)
-(main)

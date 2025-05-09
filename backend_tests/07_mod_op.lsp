@@ -1,5 +1,0 @@
-(setq x 10)
-(defun main ()
-  (princ (mod x 3))
-)
-(main)

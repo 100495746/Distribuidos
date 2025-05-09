@@ -1,8 +1,0 @@
-(setq a 1)
-(setq b 0)
-(defun main ()
-  (princ (and a b))
-  (princ " ")
-  (princ (or a b))
-)
-(main)
