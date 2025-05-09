@@ -1,0 +1,15 @@
+(setq x -1)
+(defun main ()
+  (if (< x 0)
+    (progn
+      (if (zerop (% x 2))
+        (princ "even-negative")
+        (princ "odd-negative"))
+      (terpri))
+    (progn
+      (if (zerop (% x 2))
+        (princ "even-nonneg")
+        (princ "odd-nonneg"))
+      (terpri)))
+)
+(main)

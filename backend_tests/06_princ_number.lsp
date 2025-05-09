@@ -1,0 +1,6 @@
+(setq num 42)
+(defun main ()
+  (princ num)
+  (terpri)
+)
+(main)
