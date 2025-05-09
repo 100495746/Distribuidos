@@ -5,6 +5,5 @@
       (princ i)
       (princ " ")
       (setf i (+ i 1))))
-  (terpri)
 )
 (main)

@@ -4,6 +4,5 @@
   (princ (and a b))
   (princ " ")
   (princ (or a b))
-  (terpri)
 )
 (main)

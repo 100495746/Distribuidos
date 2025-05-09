@@ -3,10 +3,10 @@
   (if (> a 2)
     (progn
       (princ "gt")
-      (terpri))
+      )
     (progn
       (princ "le")
-      (terpri))
+      )
   )
 )
 (main)
